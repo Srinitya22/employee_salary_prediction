@@ -1,13 +1,7 @@
 import streamlit as st
 import random
 import PyPDF2
-import locale
-
-# Set locale for Indian-style number formatting
-try:
-    locale.setlocale(locale.LC_ALL, 'en_IN')
-except:
-    locale.setlocale(locale.LC_ALL, '')  # fallback for platforms without en_IN
+from babel.numbers import format_currency
 
 # 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
@@ -87,17 +81,14 @@ if st.button("🔮 Predict Salary & Score"):
     score = sum(1 for kw in ats_keywords if kw in resume_lower)
     ats_score = int((score / len(ats_keywords)) * 100)
 
-    # Format salary in Indian format
-    try:
-        salary_formatted = locale.format_string("%d", salary, grouping=True)
-    except:
-        salary_formatted = f"{salary:,}"  # fallback US-style if locale fails
+    # 🇮🇳 Format salary using Indian locale
+    salary_formatted = format_currency(salary, 'INR', locale='en_IN')
 
     # 📢 Output
-    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: ₹ {salary_formatted}")
+    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {salary_formatted}")
     st.info(f"📊 ATS Resume Score: {ats_score}%")
 
     if ats_score < 50:
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
-        st.success("🎉 Awesome! Your resume is well-optimized. You're ready to shine! ✨")
+        st.markdown("🎊🎉 Congratulations! Your resume is well-optimized. You're ready to shine! 🚀🎯", unsafe_allow_html=True)
