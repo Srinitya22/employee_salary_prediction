@@ -53,7 +53,7 @@ total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_va
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 hours_per_week = st.slider("⏱️ Hours per Week", min_value=10, max_value=80, value=40)
 occupation = st.selectbox("👨‍💻 Current Occupation", [
-    "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "HR Executive"
+    "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "Student", "Graduate", "HR Executive"
 ])
 applied_role = st.selectbox("🎯 Applied Role", [
     "Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"
