@@ -2,15 +2,25 @@ import streamlit as st
 import random
 import PyPDF2
 from babel.numbers import format_currency
+import time
 
 # 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
+
+# 🌈 Gradient Background Styling
 st.markdown(
     """
     <style>
     body {
-        background-color: #f7fff7;
+        background: linear-gradient(135deg, #d0f0f0, #ffe5b4, #ffccd5);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
         font-family: 'Segoe UI', sans-serif;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
     }
     .stButton button {
         background-color: #2ecc71;
@@ -66,6 +76,7 @@ if uploaded_file is not None:
 
 # 🔘 Predict Button
 if st.button("🔮 Predict Salary & Score"):
+    # 🔢 Dummy salary prediction logic
     base_salary = 300000  # base in ₹
     salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
 
@@ -81,14 +92,20 @@ if st.button("🔮 Predict Salary & Score"):
     score = sum(1 for kw in ats_keywords if kw in resume_lower)
     ats_score = int((score / len(ats_keywords)) * 100)
 
-    # 🇮🇳 Format salary using Indian locale
-    salary_formatted = format_currency(salary, 'INR', locale='en_IN')
+    # Format salary in Indian number system
+    formatted_salary = format_currency(salary, "INR", locale="en_IN")
 
     # 📢 Output
-    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {salary_formatted}")
+    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
     st.info(f"📊 ATS Resume Score: {ats_score}%")
 
     if ats_score < 50:
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
-        st.markdown("🎊🎉 Congratulations! Your resume is well-optimized. You're ready to shine! 🚀🎯", unsafe_allow_html=True)
+        st.success("🎉 Awesome! Your resume is well-optimized. Great job!")
+
+        # 🎊 Confetti animation using emojis
+        confetti = "🎊🎉✨💥🎈"
+        for _ in range(3):
+            st.write(confetti * 5)
+            time.sleep(0.2)
