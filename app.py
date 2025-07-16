@@ -1,6 +1,13 @@
 import streamlit as st
 import random
 import PyPDF2
+import locale
+
+# Set locale for Indian-style number formatting
+try:
+    locale.setlocale(locale.LC_ALL, 'en_IN')
+except:
+    locale.setlocale(locale.LC_ALL, '')  # fallback for platforms without en_IN
 
 # 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
@@ -29,6 +36,7 @@ name = st.text_input("👤 Employee Name")
 
 # 📈 Work Experience
 total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=1)
+
 # 💍 Marital Status
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 
@@ -61,12 +69,9 @@ if uploaded_file is not None:
             resume_text += page.extract_text() or ""
     except Exception as e:
         st.error(f"Failed to read PDF: {e}")
-        
-import locale
-locale.setlocale(locale.LC_ALL, 'en_IN')
+
 # 🔘 Predict Button
 if st.button("🔮 Predict Salary & Score"):
-    # 🔢 Dummy salary prediction logic
     base_salary = 300000  # base in ₹
     salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
 
@@ -82,11 +87,17 @@ if st.button("🔮 Predict Salary & Score"):
     score = sum(1 for kw in ats_keywords if kw in resume_lower)
     ats_score = int((score / len(ats_keywords)) * 100)
 
+    # Format salary in Indian format
+    try:
+        salary_formatted = locale.format_string("%d", salary, grouping=True)
+    except:
+        salary_formatted = f"{salary:,}"  # fallback US-style if locale fails
+
     # 📢 Output
-    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: ₹ {salary:,.0f}")
+    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: ₹ {salary_formatted}")
     st.info(f"📊 ATS Resume Score: {ats_score}%")
 
     if ats_score < 50:
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
-        st.success("🎉 Awesome! Your resume is well-optimized. Great job!")
+        st.success("🎉 Awesome! Your resume is well-optimized. You're ready to shine! ✨")
