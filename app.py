@@ -2,28 +2,21 @@ import streamlit as st
 import random
 import PyPDF2
 from babel.numbers import format_currency
-import time
-from streamlit_lottie import st_lottie
-import json
-import requests
 
 # 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
 
-# 🌈 Gradient Background Styling
 st.markdown(
     """
     <style>
     body {
-        background: linear-gradient(135deg, #d0f0f0, #ffe5b4, #ffccd5);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
+        background-color: #f7fff7;
         font-family: 'Segoe UI', sans-serif;
     }
-    @keyframes gradientBG {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
+    .stApp {
+        background: linear-gradient(120deg, #d0f0f0, #ffe0cc, #ffd6e8);
+        color: #333;
+        font-family: 'Segoe UI', sans-serif;
     }
     .stButton button {
         background-color: #2ecc71;
@@ -35,19 +28,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Load Lottie animation
-@st.cache_data
-def load_lottie_url(url):
-    r = requests.get(url)
-    if r.status_code == 200:
-        return r.json()
-    return None
-
-confetti_lottie = load_lottie_url("https://lottie.host/2cfa10a4-8c5d-4706-9771-10e83994f0d2/RddHZvnHYv.json")
-
-# 🎯 Title
-st.title("AI Powered Employee Salary Predictor with ATS Score")
-st.subheader("Predict salary in ₹ & check your resume score 🔍")
+st.title("🌈 AI Powered Employee Salary Predictor")
+st.subheader("📊 Predict salary in ₹ & check your resume's ATS score!")
 
 # 📥 Name Input
 name = st.text_input("👤 Employee Name")
@@ -90,28 +72,26 @@ if uploaded_file is not None:
 
 # 🔘 Predict Button
 if st.button("🔮 Predict Salary & Score"):
-    # Dummy logic
+    # 🔢 Dummy salary prediction logic
     base_salary = 300000
     salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
 
     if marital_status == "Married":
         salary += 20000
+
     if location in ["Bangalore", "Mumbai", "Delhi"]:
         salary += 50000
 
-    # ATS Score
+    # 🎯 ATS Scoring
     ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
     resume_lower = resume_text.lower()
     score = sum(1 for kw in ats_keywords if kw in resume_lower)
     ats_score = int((score / len(ats_keywords)) * 100)
 
-    # Indian style salary
-    formatted_salary = format_currency(salary, "INR", locale="en_IN")
-
-    # Output
-    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
+    # 📢 Output
+    salary_formatted = format_currency(salary, 'INR', locale='en_IN')
+    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {salary_formatted}")
     st.info(f"📊 ATS Resume Score: {ats_score}%")
-
     if ats_score < 50:
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
