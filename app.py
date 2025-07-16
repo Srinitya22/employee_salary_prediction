@@ -3,9 +3,9 @@ from babel.numbers import format_currency
 import PyPDF2
 
 # 🎨 Page Config
-st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
+st.set_page_config(page_title="Employee Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
 
-# ✅ Custom CSS: Full-page pastel gradient background (teal, peach, baby pink)
+# ✅ CSS for gradient background and bold black text
 st.markdown("""
     <style>
     html, body, [data-testid="stAppViewContainer"] {
@@ -34,11 +34,17 @@ st.markdown("""
         font-weight: bold;
         border-radius: 8px;
     }
+
+    /* Bold and black title and subtitle */
+    h1, h2 {
+        color: #000000 !important;
+        font-weight: 800 !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
 # 🏷️ Title and subtitle
-st.title("AI Powered Employee Salary Predictor 🇮🇳")
+st.title("Employee Salary Predictor Using ML Algorithm")
 st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
 # 📥 Form Inputs
