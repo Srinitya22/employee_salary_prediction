@@ -61,7 +61,9 @@ if uploaded_file is not None:
             resume_text += page.extract_text() or ""
     except Exception as e:
         st.error(f"Failed to read PDF: {e}")
-
+        
+import locale
+locale.setlocale(locale.LC_ALL, 'en_IN')
 # 🔘 Predict Button
 if st.button("🔮 Predict Salary & Score"):
     # 🔢 Dummy salary prediction logic
@@ -87,4 +89,4 @@ if st.button("🔮 Predict Salary & Score"):
     if ats_score < 50:
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
-        st.balloons()
+        st.success("🎉 Awesome! Your resume is well-optimized. Great job!")
