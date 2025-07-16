@@ -1,4 +1,4 @@
-
+# employee_salary_predictor.py
 from flask import Flask, render_template_string, request
 from werkzeug.utils import secure_filename
 import os
@@ -10,6 +10,11 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# Dropdown options
+OCCUPATIONS = ["Software Engineer", "Data Scientist", "Product Manager", "HR Executive", "Marketing Analyst"]
+POSITIONS = ["Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"]
+LOCATIONS = ["San Francisco", "New York", "Austin", "Seattle", "Remote"]
+
 TEMPLATE = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -17,10 +22,12 @@ TEMPLATE = '''
   <meta charset="UTF-8">
   <title>Employee Salary Predictor</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; }
-    input, select { width: 100%; padding: 8px; margin-bottom: 1rem; }
-    button { padding: 10px 20px; }
-    .result { margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 8px; }
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; background: #f9fafc; }
+    input, select { width: 100%; padding: 10px; margin-bottom: 1rem; border-radius: 6px; border: 1px solid #ccc; }
+    button { padding: 12px 24px; background: #007BFF; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .result { margin-top: 2rem; padding: 1.5rem; background: #e9f7ef; border: 1px solid #28a745; border-radius: 8px; }
+    .result h2 { color: #155724; }
   </style>
 </head>
 <body>
@@ -36,15 +43,25 @@ TEMPLATE = '''
     </select>
     <input type="number" name="age" min="18" max="65" value="{{ data.age }}" placeholder="Age" required />
     <input type="number" name="years_of_experience" value="{{ data.years_of_experience }}" placeholder="Years of Experience" required />
+    <input type="number" name="work_experience" value="{{ data.work_experience }}" placeholder="Previous Work Experience (Years)" required />
     <select name="marital_status" required>
       <option value="">Marital Status</option>
       <option>Single</option>
       <option>Married</option>
     </select>
     <input type="number" name="hours_per_week" value="{{ data.hours_per_week }}" placeholder="Hours per Week" required />
-    <input type="text" name="occupation" placeholder="Occupation" required />
-    <input type="text" name="applied_position" placeholder="Applied Position" required />
-    <input type="text" name="place" placeholder="Location" required />
+    <select name="occupation" required>
+      <option value="">Select Occupation</option>
+      {% for job in occupations %}<option value="{{ job }}">{{ job }}</option>{% endfor %}
+    </select>
+    <select name="applied_position" required>
+      <option value="">Select Applied Position</option>
+      {% for role in positions %}<option value="{{ role }}">{{ role }}</option>{% endfor %}
+    </select>
+    <select name="place" required>
+      <option value="">Select Location</option>
+      {% for city in locations %}<option value="{{ city }}">{{ city }}</option>{% endfor %}
+    </select>
     <button type="submit">Predict Salary</button>
   </form>
   {% if salary and ats_score %}
@@ -93,6 +110,7 @@ def index():
         'gender': '',
         'age': 25,
         'years_of_experience': 1,
+        'work_experience': 0,
         'marital_status': '',
         'hours_per_week': 40,
         'occupation': '',
@@ -113,14 +131,16 @@ def index():
             data[key] = request.form.get(key)
 
         base = 30000
-        experience_factor = int(data['years_of_experience']) * 1000
-        hours_factor = int(data['hours_per_week']) * 50
-        place_factor = 10000 if data['place'] == 'San Francisco' else 0
+        experience_factor = int(data['years_of_experience']) * 1200
+        work_exp_factor = int(data['work_experience']) * 800
+        hours_factor = int(data['hours_per_week']) * 60
+        place_factor = 10000 if data['place'] == 'San Francisco' else 5000 if data['place'] == 'New York' else 2000
 
-        salary = base + experience_factor + hours_factor + place_factor
+        salary = base + experience_factor + hours_factor + work_exp_factor + place_factor
         ats_score = calculate_ats_score(resume_text, data['applied_position'])
 
-    return render_template_string(TEMPLATE, data=data, salary=salary, ats_score=ats_score)
+    return render_template_string(TEMPLATE, data=data, salary=salary, ats_score=ats_score, 
+                                  occupations=OCCUPATIONS, positions=POSITIONS, locations=LOCATIONS)
 
 if __name__ == '__main__':
     app.run(debug=True)
