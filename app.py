@@ -1,44 +1,92 @@
 import streamlit as st
-import fitz  # PyMuPDF
+import random
+import PyPDF2
 
-# Page configuration
-st.set_page_config(page_title="Resume Analyzer 🇮🇳", page_icon="🧾", layout="centered")
+# 🎨 Page Setup
+st.set_page_config(page_title="Indian Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #f7fff7;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .stButton button {
+        background-color: #2ecc71;
+        color: white;
+        font-weight: bold;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# App title
-st.title("🧾 Indian Resume Analyzer")
-st.markdown("Upload your **PDF resume** and get an estimated ATS score!")
+st.title("🇮🇳 Indian Employee Salary Predictor")
+st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
-# Upload PDF
-uploaded_file = st.file_uploader("📤 Upload your resume (PDF only)", type=["pdf"])
+# 📥 Name Input
+name = st.text_input("👤 Employee Name")
 
-# Function to extract text from PDF
-def extract_text_from_pdf(uploaded_pdf):
-    text = ""
-    with fitz.open(stream=uploaded_pdf.read(), filetype="pdf") as doc:
-        for page in doc:
-            text += page.get_text()
-    return text
+# 📈 Experience
+total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=1)
+prev_exp = st.number_input("🔁 Previous Experience (Years)", min_value=0, max_value=40, value=0)
 
-# If file is uploaded
-if uploaded_file:
-    st.success("✅ PDF uploaded successfully!")
+# 💍 Marital Status
+marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 
-    # Extract text
-    extracted_text = extract_text_from_pdf(uploaded_file)
+# ⏱️ Work Hours
+hours_per_week = st.slider("⏱️ Hours per Week", min_value=10, max_value=80, value=40)
 
-    # Show extracted text
-    st.subheader("📄 Extracted Resume Content:")
-    st.text_area("Text Preview", extracted_text, height=300)
+# 👨‍💻 Current Occupation
+occupation = st.selectbox("👨‍💻 Current Occupation", [
+    "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "HR Executive"
+])
 
-    # Dummy ATS score (just for demo)
-    score = min(100, len(extracted_text) // 20 + 35)
-    st.subheader("📊 ATS Score Estimate:")
-    st.progress(score / 100)
-    st.success(f"🎯 Your estimated ATS score is: **{score} / 100**")
+# 🎯 Applied Role
+applied_role = st.selectbox("🎯 Applied Role", [
+    "Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"
+])
 
-else:
-    st.info("Please upload a PDF file to begin.")
+# 📍 Indian Location
+location = st.selectbox("📍 Location", [
+    "Bangalore", "Hyderabad", "Delhi", "Mumbai", "Chennai", "Kolkata", "Pune", "Remote"
+])
 
-# Footer
-st.markdown("---")
-st.markdown("🛠️ Made with ❤️ by V.Srinitya for Indian job seekers | Supports only **PDF** resumes for now.")
+# 📄 Resume Upload
+uploaded_file = st.file_uploader("📄 Upload Your Resume (PDF)", type=["pdf"])
+resume_text = ""
+
+if uploaded_file is not None:
+    try:
+        pdf_reader = PyPDF2.PdfReader(uploaded_file)
+        for page in pdf_reader.pages:
+            resume_text += page.extract_text() or ""
+    except Exception as e:
+        st.error(f"Failed to read PDF: {e}")
+
+# 🔘 Predict Button
+if st.button("🔮 Predict Salary & Score"):
+    # 🔢 Dummy salary prediction logic
+    base_salary = 300000  # base in ₹
+    salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
+
+    if marital_status == "Married":
+        salary += 20000
+
+    if location in ["Bangalore", "Mumbai", "Delhi"]:
+        salary += 50000  # high cost cities
+
+    # 🎯 ATS Scoring
+    ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
+    resume_lower = resume_text.lower()
+    score = sum(1 for kw in ats_keywords if kw in resume_lower)
+    ats_score = int((score / len(ats_keywords)) * 100)
+
+    # 📢 Output
+    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: ₹ {salary:,.0f}")
+    st.info(f"📊 ATS Resume Score: {ats_score}%")
+
+    if ats_score < 50:
+        st.warning("⚠️ Consider improving your resume with more relevant skills!")
+    else:
+        st.balloons()
