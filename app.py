@@ -96,4 +96,3 @@ if st.button("🔮 Predict Salary & Score"):
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
         st.success("🎉 Awesome! Your resume is well-optimized. Great job!")
-        st_lottie(confetti_lottie, height=250, key="confetti")
