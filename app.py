@@ -3,7 +3,7 @@ import random
 import PyPDF2
 
 # 🎨 Page Setup
-st.set_page_config(page_title="Indian Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
+st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
 st.markdown(
     """
     <style>
@@ -21,7 +21,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("🇮🇳 Indian Employee Salary Predictor")
+st.title("AI Powered Employee Salary Predictor with ATS Score")
 st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
 # 📥 Name Input
