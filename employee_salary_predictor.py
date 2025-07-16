@@ -1,93 +1,23 @@
-# employee_salary_predictor.py
-from flask import Flask, render_template_string, request
-from werkzeug.utils import secure_filename
-import os
+# app.py
+import streamlit as st
 import random
 from PyPDF2 import PdfReader
 from docx import Document
+import os
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+st.set_page_config(page_title="Employee Salary Predictor", layout="centered")
 
-# Dropdown options
-OCCUPATIONS = ["Software Engineer", "Data Scientist", "Product Manager", "HR Executive", "Marketing Analyst"]
-POSITIONS = ["Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"]
-LOCATIONS = ["San Francisco", "New York", "Austin", "Seattle", "Remote"]
-
-TEMPLATE = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Employee Salary Predictor</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; background: #f9fafc; }
-    input, select { width: 100%; padding: 10px; margin-bottom: 1rem; border-radius: 6px; border: 1px solid #ccc; }
-    button { padding: 12px 24px; background: #007BFF; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    .result { margin-top: 2rem; padding: 1.5rem; background: #e9f7ef; border: 1px solid #28a745; border-radius: 8px; }
-    .result h2 { color: #155724; }
-  </style>
-</head>
-<body>
-  <h1>Employee Salary Predictor</h1>
-  <form method="POST" enctype="multipart/form-data">
-    <input type="file" name="resume" required />
-    <input type="text" name="name" placeholder="Name" required />
-    <select name="gender" required>
-      <option value="">Select Gender</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
-    </select>
-    <input type="number" name="age" min="18" max="65" value="{{ data.age }}" placeholder="Age" required />
-    <input type="number" name="years_of_experience" value="{{ data.years_of_experience }}" placeholder="Years of Experience" required />
-    <input type="number" name="work_experience" value="{{ data.work_experience }}" placeholder="Previous Work Experience (Years)" required />
-    <select name="marital_status" required>
-      <option value="">Marital Status</option>
-      <option>Single</option>
-      <option>Married</option>
-    </select>
-    <input type="number" name="hours_per_week" value="{{ data.hours_per_week }}" placeholder="Hours per Week" required />
-    <select name="occupation" required>
-      <option value="">Select Occupation</option>
-      {% for job in occupations %}<option value="{{ job }}">{{ job }}</option>{% endfor %}
-    </select>
-    <select name="applied_position" required>
-      <option value="">Select Applied Position</option>
-      {% for role in positions %}<option value="{{ role }}">{{ role }}</option>{% endfor %}
-    </select>
-    <select name="place" required>
-      <option value="">Select Location</option>
-      {% for city in locations %}<option value="{{ city }}">{{ city }}</option>{% endfor %}
-    </select>
-    <button type="submit">Predict Salary</button>
-  </form>
-  {% if salary and ats_score %}
-  <div class="result">
-    <h2>Prediction Results</h2>
-    <p><strong>Predicted Salary:</strong> ${{ salary }}</p>
-    <p><strong>ATS Score:</strong> {{ ats_score }}%</p>
-  </div>
-  {% endif %}
-</body>
-</html>
-'''
-
-def extract_text_from_resume(filepath):
-    if filepath.endswith(".pdf"):
-        try:
-            pdf = PdfReader(filepath)
+# --- Helper functions ---
+def extract_text_from_resume(file):
+    try:
+        if file.name.endswith(".pdf"):
+            pdf = PdfReader(file)
             return " ".join(page.extract_text() or '' for page in pdf.pages)
-        except:
-            return ""
-    elif filepath.endswith(".docx"):
-        try:
-            doc = Document(filepath)
+        elif file.name.endswith(".docx"):
+            doc = Document(file)
             return " ".join([para.text for para in doc.paragraphs])
-        except:
-            return ""
+    except:
+        return ""
     return ""
 
 def calculate_ats_score(resume_text, applied_position):
@@ -101,46 +31,41 @@ def calculate_ats_score(resume_text, applied_position):
     score = int((matched / len(applied_keywords)) * 100)
     return min(score + random.randint(0, 20), 100)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    salary = None
-    ats_score = None
-    data = {
-        'name': '',
-        'gender': '',
-        'age': 25,
-        'years_of_experience': 1,
-        'work_experience': 0,
-        'marital_status': '',
-        'hours_per_week': 40,
-        'occupation': '',
-        'applied_position': '',
-        'place': ''
-    }
+# --- UI ---
+st.title("📊 Employee Salary Predictor")
+st.markdown("Upload your resume and fill in the details to predict your salary and ATS score.")
 
-    if request.method == 'POST':
-        resume = request.files['resume']
-        resume_text = ""
-        if resume:
-            filename = secure_filename(resume.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            resume.save(filepath)
-            resume_text = extract_text_from_resume(filepath)
+with st.form("prediction_form"):
+    resume_file = st.file_uploader("📄 Upload Resume (.pdf or .docx)", type=["pdf", "docx"], required=True)
+    name = st.text_input("Full Name")
+    gender = st.selectbox("Gender", ["Select", "Male", "Female", "Other"])
+    age = st.slider("Age", 18, 65, 25)
+    years_exp = st.slider("Years of Experience", 0, 40, 1)
+    work_exp = st.slider("Previous Work Experience (Years)", 0, 40, 0)
+    marital_status = st.selectbox("Marital Status", ["Select", "Single", "Married"])
+    hours_per_week = st.slider("Working Hours Per Week", 20, 80, 40)
+    occupation = st.selectbox("Occupation", ["Select", "Software Engineer", "Data Scientist", "Product Manager", "HR Executive", "Marketing Analyst"])
+    applied_position = st.selectbox("Applied Position", ["Select", "Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"])
+    location = st.selectbox("Location", ["Select", "San Francisco", "New York", "Austin", "Seattle", "Remote"])
+    
+    submitted = st.form_submit_button("🚀 Predict")
 
-        for key in data:
-            data[key] = request.form.get(key)
+if submitted:
+    if resume_file is not None and applied_position != "Select":
+        resume_text = extract_text_from_resume(resume_file)
 
+        # Salary prediction logic
         base = 30000
-        experience_factor = int(data['years_of_experience']) * 1200
-        work_exp_factor = int(data['work_experience']) * 800
-        hours_factor = int(data['hours_per_week']) * 60
-        place_factor = 10000 if data['place'] == 'San Francisco' else 5000 if data['place'] == 'New York' else 2000
+        experience_factor = years_exp * 1200
+        work_exp_factor = work_exp * 800
+        hours_factor = hours_per_week * 60
+        place_factor = 10000 if location == 'San Francisco' else 5000 if location == 'New York' else 2000
 
-        salary = base + experience_factor + hours_factor + work_exp_factor + place_factor
-        ats_score = calculate_ats_score(resume_text, data['applied_position'])
+        salary = base + experience_factor + work_exp_factor + hours_factor + place_factor
+        ats_score = calculate_ats_score(resume_text, applied_position)
 
-    return render_template_string(TEMPLATE, data=data, salary=salary, ats_score=ats_score, 
-                                  occupations=OCCUPATIONS, positions=POSITIONS, locations=LOCATIONS)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        st.success("✅ Prediction Complete!")
+        st.metric("💰 Predicted Salary", f"${salary:,.0f}")
+        st.metric("📈 ATS Score", f"{ats_score}%")
+    else:
+        st.error("Please complete all fields and upload a resume.")
