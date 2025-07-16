@@ -3,3 +3,5 @@ werkzeug
 PyPDF2
 python-docx
 babel
+streamlit-lottie
+requests
