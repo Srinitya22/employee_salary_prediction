@@ -1,55 +1,57 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LinearRegression
 
-# 🎨 Background Styling
+st.set_page_config(page_title="Indian Salary Predictor", layout="centered")
+
+# Custom CSS for background and style
 st.markdown(
     """
     <style>
-    .stApp {
-        background-image: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
-        color: #000000;
+    body {
+        background-image: linear-gradient(to right, #fceabb, #f8b500);
         font-family: 'Segoe UI', sans-serif;
+    }
+    .stButton>button {
+        background-color: #ff4b4b;
+        color: white;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# 🌟 Title
-st.title("👩‍💼 Employee Salary Predictor - India 🇮🇳")
+st.title("🇮🇳 Indian Employee Salary Predictor")
+st.caption("🎉 Estimate your annual salary based on your profile!")
 
-# 📍 Sample Indian Locations
-locations = [
-    "Bengaluru", "Hyderabad", "Mumbai", "Delhi", "Chennai", "Kolkata",
-    "Pune", "Ahmedabad", "Jaipur", "Lucknow", "Guwahati", "Bhopal"
-]
+# User Inputs
+experience = st.number_input("💼 Years of Total Experience", min_value=0, max_value=50, step=1, value=1)
+prev_exp = st.number_input("📑 Previous Work Experience (in years)", min_value=0, max_value=50, step=1, value=0)
+marital_status = st.selectbox("⚪ Marital Status", ["Single", "Married"])
+hours = st.slider("⏰ Hours per Week", min_value=10, max_value=80, value=40)
+current_role = st.selectbox("👨‍💻 Current Occupation", ["Software Engineer", "Data Analyst", "Designer", "Project Manager"])
+applied_role = st.selectbox("🧲 Applied Role", ["Junior Developer", "Senior Developer", "Data Scientist", "QA Tester"])
+location = st.selectbox("📍 Location", ["Bengaluru", "Hyderabad", "Mumbai", "Chennai", "Delhi", "Pune", "Remote"])
 
-# 📊 Inputs from user
-experience = st.slider("Years of Experience", 0, 30, 2)
-location = st.selectbox("Location", locations)
-education = st.selectbox("Education Level", ["High School", "Bachelor's", "Master's", "PhD"])
-industry = st.selectbox("Industry", ["IT", "Finance", "Healthcare", "Education", "Manufacturing"])
+# Simple salary estimation logic (mock logic for illustration)
+base_salary = 300000  # Base INR
+exp_boost = experience * 50000
+hours_boost = (hours - 40) * 1000
+location_factor = {
+    "Bengaluru": 1.3,
+    "Hyderabad": 1.2,
+    "Mumbai": 1.35,
+    "Chennai": 1.15,
+    "Delhi": 1.25,
+    "Pune": 1.1,
+    "Remote": 1.0
+}
+role_factor = {
+    "Junior Developer": 1.0,
+    "Senior Developer": 1.5,
+    "Data Scientist": 1.7,
+    "QA Tester": 1.2
+}
 
-# 🔧 Dummy Encoding
-def encode_inputs(exp, location, education, industry):
-    # For simplicity, encode as numbers
-    loc_encoded = locations.index(location)
-    edu_map = {"High School": 0, "Bachelor's": 1, "Master's": 2, "PhD": 3}
-    ind_map = {"IT": 0, "Finance": 1, "Healthcare": 2, "Education": 3, "Manufacturing": 4}
-    return [exp, loc_encoded, edu_map[education], ind_map[industry]]
+salary = (base_salary + exp_boost + hours_boost) * location_factor[location] * role_factor[applied_role]
 
-# 🧠 Dummy Training Data (for demo)
-np.random.seed(42)
-X_train = np.random.randint(0, 20, size=(100, 4))
-y_train = X_train[:, 0] * 50000 + np.random.randint(20000, 100000, size=100)  # salary in INR
-
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-# 📈 Prediction
-if st.button("Predict Salary"):
-    features = encode_inputs(experience, location, education, industry)
-    prediction = model.predict([features])[0]
-    st.success(f"Estimated Salary: ₹{int(prediction):,} /year")
+if st.button("💰 Predict Salary"):
+    st.success(f"Estimated Salary: ₹{int(salary):,} /year")
