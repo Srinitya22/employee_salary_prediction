@@ -3,6 +3,9 @@ import random
 import PyPDF2
 from babel.numbers import format_currency
 import time
+from streamlit_lottie import st_lottie
+import json
+import requests
 
 # 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
@@ -32,6 +35,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Load Lottie animation
+@st.cache_data
+def load_lottie_url(url):
+    r = requests.get(url)
+    if r.status_code == 200:
+        return r.json()
+    return None
+
+confetti_lottie = load_lottie_url("https://lottie.host/2cfa10a4-8c5d-4706-9771-10e83994f0d2/RddHZvnHYv.json")
+
+# 🎯 Title
 st.title("AI Powered Employee Salary Predictor with ATS Score")
 st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
@@ -76,26 +90,25 @@ if uploaded_file is not None:
 
 # 🔘 Predict Button
 if st.button("🔮 Predict Salary & Score"):
-    # 🔢 Dummy salary prediction logic
-    base_salary = 300000  # base in ₹
+    # Dummy logic
+    base_salary = 300000
     salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
 
     if marital_status == "Married":
         salary += 20000
-
     if location in ["Bangalore", "Mumbai", "Delhi"]:
-        salary += 50000  # high cost cities
+        salary += 50000
 
-    # 🎯 ATS Scoring
+    # ATS Score
     ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
     resume_lower = resume_text.lower()
     score = sum(1 for kw in ats_keywords if kw in resume_lower)
     ats_score = int((score / len(ats_keywords)) * 100)
 
-    # Format salary in Indian number system
+    # Indian style salary
     formatted_salary = format_currency(salary, "INR", locale="en_IN")
 
-    # 📢 Output
+    # Output
     st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
     st.info(f"📊 ATS Resume Score: {ats_score}%")
 
@@ -103,9 +116,4 @@ if st.button("🔮 Predict Salary & Score"):
         st.warning("⚠️ Consider improving your resume with more relevant skills!")
     else:
         st.success("🎉 Awesome! Your resume is well-optimized. Great job!")
-
-        # 🎊 Confetti animation using emojis
-        confetti = "🎊🎉✨💥🎈"
-        for _ in range(3):
-            st.write(confetti * 5)
-            time.sleep(0.2)
+        st_lottie(confetti_lottie, height=250, key="confetti")
