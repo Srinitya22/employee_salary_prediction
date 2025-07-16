@@ -1,4 +1,4 @@
-# employee_salary_predictor.py
+
 from flask import Flask, render_template_string, request
 from werkzeug.utils import secure_filename
 import os
@@ -112,15 +112,12 @@ def index():
         for key in data:
             data[key] = request.form.get(key)
 
-        # Salary prediction logic
         base = 30000
         experience_factor = int(data['years_of_experience']) * 1000
         hours_factor = int(data['hours_per_week']) * 50
         place_factor = 10000 if data['place'] == 'San Francisco' else 0
 
         salary = base + experience_factor + hours_factor + place_factor
-
-        # Real ATS score based on resume content
         ats_score = calculate_ats_score(resume_text, data['applied_position'])
 
     return render_template_string(TEMPLATE, data=data, salary=salary, ats_score=ats_score)
