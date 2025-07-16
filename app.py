@@ -3,7 +3,7 @@ import random
 import PyPDF2
 from babel.numbers import format_currency
 
-# 🎨 Page Setup with pastel gradient background
+# 🎨 Page Setup
 st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
 st.markdown(
     """
@@ -12,25 +12,20 @@ st.markdown(
         background-color: #f7fff7;
         font-family: 'Segoe UI', sans-serif;
     }
-
     .stApp {
         background: linear-gradient(120deg, #d0f0f0, #ffe0cc, #ffd6e8);
         color: #333;
     }
-
     input, textarea, select {
         background-color: #ffffff !important;
         color: #000000 !important;
     }
-
     .stTextInput > div > div > input {
         color: #000000 !important;
     }
-
     .stSelectbox > div > div > div {
         color: #000000 !important;
     }
-
     .stButton button {
         background-color: #2ecc71;
         color: white;
@@ -43,11 +38,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 🏷️ Title and subtitle
 st.title("AI Powered Employee Salary Predictor 🇮🇳")
 st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
-# 🧑‍💼 Inputs
+# Input Fields
 name = st.text_input("👤 Employee Name")
 total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=1)
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
@@ -65,42 +59,42 @@ location = st.selectbox("📍 Location", [
     "Bangalore", "Hyderabad", "Delhi", "Mumbai", "Chennai", "Kolkata", "Pune", "Remote"
 ])
 
-# 📄 Resume Upload
+# Resume Upload
 uploaded_file = st.file_uploader("📄 Upload Your Resume (PDF)", type=["pdf"])
 resume_text = ""
 
-if uploaded_file is not None:
-    try:
-        pdf_reader = PyPDF2.PdfReader(uploaded_file)
-        for page in pdf_reader.pages:
-            resume_text += page.extract_text() or ""
-    except Exception as e:
-        st.error(f"Failed to read PDF: {e}")
-
 # 🔮 Predict Button
 if st.button("Predict Salary & Resume Score"):
-    base_salary = 300000
-    salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
-
-    if marital_status == "Married":
-        salary += 20000
-
-    if location in ["Bangalore", "Mumbai", "Delhi"]:
-        salary += 50000
-
-    # ATS scoring
-    ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
-    resume_lower = resume_text.lower()
-    score = sum(1 for kw in ats_keywords if kw in resume_lower)
-    ats_score = int((score / len(ats_keywords)) * 100)
-
-    # Format salary in Indian numbering style
-    formatted_salary = format_currency(salary, 'INR', locale='en_IN')
-
-    st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
-    st.info(f"📊 ATS Resume Score: {ats_score}%")
-
-    if ats_score < 50:
-        st.warning("⚠️ Consider improving your resume with more relevant skills!")
+    if uploaded_file is None:
+        st.error("🚫 Please upload your resume in PDF format to proceed!")
     else:
-        st.toast("✅ Your resume is well-optimized!", icon="🎯")
+        try:
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            for page in pdf_reader.pages:
+                resume_text += page.extract_text() or ""
+        except Exception as e:
+            st.error(f"Failed to read PDF: {e}")
+        else:
+            base_salary = 300000
+            salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
+
+            if marital_status == "Married":
+                salary += 20000
+
+            if location in ["Bangalore", "Mumbai", "Delhi"]:
+                salary += 50000
+
+            ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
+            resume_lower = resume_text.lower()
+            score = sum(1 for kw in ats_keywords if kw in resume_lower)
+            ats_score = int((score / len(ats_keywords)) * 100)
+
+            formatted_salary = format_currency(salary, 'INR', locale='en_IN')
+
+            st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
+            st.info(f"📊 ATS Resume Score: {ats_score}%")
+
+            if ats_score < 50:
+                st.warning("⚠️ Consider improving your resume with more relevant skills!")
+            else:
+                st.toast("✅ Your resume is well-optimized!", icon="🎯")
