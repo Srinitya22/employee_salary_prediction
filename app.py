@@ -27,10 +27,8 @@ st.subheader("Predict salary in ₹ & check your resume score 🔍")
 # 📥 Name Input
 name = st.text_input("👤 Employee Name")
 
-# 📈 Experience
+# 📈 Work Experience
 total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=1)
-prev_exp = st.number_input("🔁 Previous Experience (Years)", min_value=0, max_value=40, value=0)
-
 # 💍 Marital Status
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 
