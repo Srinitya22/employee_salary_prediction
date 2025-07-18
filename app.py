@@ -1,68 +1,63 @@
 import streamlit as st
-from babel.numbers import format_currency
 import PyPDF2
+from babel.numbers import format_currency
 
-# 🎨 Page Config
-st.set_page_config(page_title="Employee Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
+# Page Setup
+st.set_page_config(page_title="AI Powered Salary Predictor 💼🇮🇳", page_icon="💰", layout="centered")
 
-# ✅ CSS for gradient background and bold black text
-st.markdown("""
+# Custom CSS for pastel background and dark text
+st.markdown(
+    """
     <style>
-    html, body, [data-testid="stAppViewContainer"] {
-        height: 100%;
-        background: linear-gradient(135deg, #d0f0f7, #ffe0d2, #fddde6);
-        background-attachment: fixed;
+    .main {
+        background: linear-gradient(to bottom right, #f9e4e4, #e0f7f4, #fdeacc);
+        padding: 20px;
+        border-radius: 10px;
     }
-
-    [data-testid="stHeader"], [data-testid="stToolbar"] {
-        background: transparent;
-    }
-
-    label, .stTextInput label, .stNumberInput label, .stSelectbox label, .stSlider label {
-        color: #333333 !important;
-        font-weight: 600;
-    }
-
-    .stTextInput input, .stSelectbox div, .stNumberInput input {
-        background-color: #ffffff !important;
+    h1, h2, h3, h4, h5, h6 {
         color: #000000 !important;
+        font-weight: bold !important;
     }
-
+    label, .stSelectbox label, .stSlider label, .stNumberInput label, .stTextInput label {
+        color: #000000 !important;
+        font-weight: 500;
+    }
     .stButton button {
         background-color: #2ecc71;
         color: white;
         font-weight: bold;
-        border-radius: 8px;
-    }
-
-    /* Bold and black title and subtitle */
-    h1, h2 {
-        color: #000000 !important;
-        font-weight: 800 !important;
     }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
-# 🏷️ Title and subtitle
-st.title("Employee Salary Predictor Using ML Algorithm")
-st.subheader("Predict salary in ₹ & check your resume score 🔍")
+# Title & Subtitle
+st.title("💼 AI Powered Employee Salary Predictor 🇮🇳")
+st.subheader("🔍 Predict salary in ₹ & check your resume score")
 
-# 📥 Form Inputs
+# Input Fields
 name = st.text_input("👤 Employee Name")
-total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=0)
+
+total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=1)
+
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
+
 hours_per_week = st.slider("⏱️ Hours per Week", min_value=10, max_value=80, value=40)
+
 occupation = st.selectbox("👨‍💻 Current Occupation", [
-    "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "Student", "Graduate", "HR Executive"
+    "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "HR Executive"
 ])
+
 applied_role = st.selectbox("🎯 Applied Role", [
     "Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"
 ])
+
 location = st.selectbox("📍 Location", [
     "Bangalore", "Hyderabad", "Delhi", "Mumbai", "Chennai", "Kolkata", "Pune", "Remote"
 ])
 
-# 📄 Resume Upload
+# Resume Upload
 uploaded_file = st.file_uploader("📄 Upload Your Resume (PDF)", type=["pdf"])
 resume_text = ""
 
@@ -72,37 +67,53 @@ if uploaded_file is not None:
         for page in pdf_reader.pages:
             resume_text += page.extract_text() or ""
     except Exception as e:
-        st.error(f"❌ Failed to read PDF: {e}")
+        st.error(f"Failed to read PDF: {e}")
 
-# 🔘 Predict Button
-if st.button("🔮 Predict Salary & Score"):
-    if uploaded_file is None or not resume_text.strip():
-        st.error("⚠️ Please upload your resume to proceed with prediction.")
+# Predict Button
+if st.button("🔍 Predict Salary & Score"):
+    if uploaded_file is None:
+        st.error("⚠️ Please upload your resume before predicting.")
     else:
-        # 🧠 Salary Prediction Logic
-        base_salary = 200000 if total_exp == 0 else 300000
-        salary = base_salary + (total_exp * 45000) + (hours_per_week * 900)
+        # Dummy salary prediction logic
+        base_salary = 250000  # fresher base
+        salary = base_salary + (total_exp * 50000) + (hours_per_week * 1000)
 
         if marital_status == "Married":
             salary += 20000
 
         if location in ["Bangalore", "Mumbai", "Delhi"]:
-            salary += 40000
-        elif location == "Remote":
-            salary -= 30000
+            salary += 50000  # metro cities
 
-        # 📊 ATS Resume Scoring
+        if location == "Remote":
+            salary -= 30000  # less compensation for remote
+
+        if total_exp == 0:
+            salary = 200000  # default for freshers
+
+        # Format salary in Indian notation
+        formatted_salary = format_currency(salary, 'INR', locale='en_IN').replace(".00", "")
+
+        # ATS Scoring
         ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
         resume_lower = resume_text.lower()
-        matched_keywords = sum(1 for kw in ats_keywords if kw in resume_lower)
-        ats_score = int((matched_keywords / len(ats_keywords)) * 100)
+        score = sum(1 for kw in ats_keywords if kw in resume_lower)
+        ats_score = int((score / len(ats_keywords)) * 100)
 
-        # 📢 Output Results
-        formatted_salary = format_currency(salary, 'INR', locale='en_IN')
-        st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
-        st.info(f"📊 ATS Resume Score: {ats_score}%")
+        # Output Display
+        st.markdown(f"""
+            <div style='background-color:#d4edda; padding:12px; border-radius:8px; color:black; font-weight:bold;'>
+                💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}
+            </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <div style='background-color:#d1ecf1; padding:12px; border-radius:8px; color:black; font-weight:bold;'>
+                📊 ATS Resume Score: {ats_score}%
+            </div>
+        """, unsafe_allow_html=True)
 
         if ats_score < 50:
-            st.warning("⚠️ Consider improving your resume with more relevant skills.")
+            st.warning("⚠️ Consider improving your resume with more relevant skills!")
         else:
-            st.success("✅ Great! Your resume is well-optimized.")
+            st.success("✅ Great! Your resume looks well-optimized!")
+            
