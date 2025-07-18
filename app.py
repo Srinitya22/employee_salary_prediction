@@ -3,7 +3,7 @@ from babel.numbers import format_currency
 import PyPDF2
 
 # 🎨 Page Config
-st.set_page_config(page_title="Employee Salary Predictor using ML algorithm", page_icon="💰", layout="centered")
+st.set_page_config(page_title="Employee Salary Prediction", page_icon="💰", layout="centered")
 
 # ✅ CSS for gradient background and bold black text
 st.markdown("""
@@ -44,7 +44,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 🏷️ Title and subtitle
-st.title("Employee Salary Predictor Using ML Algorithm")
+st.title("Employee Salary Predictor using ML Algorithm")
 st.subheader("Predict salary in ₹ & check your resume score 🔍")
 
 # 📥 Form Inputs
