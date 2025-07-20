@@ -1,17 +1,11 @@
 import streamlit as st
 from babel.numbers import format_currency
 import PyPDF2
-import joblib
-import numpy as np
-
-# Load model and label encoder
-model = joblib.load("salary_predictor.pkl")
-encoder = joblib.load("label_encoder.pkl")
 
 # 🎨 Page Config
 st.set_page_config(page_title="Employee Salary Prediction", page_icon="💰", layout="centered")
 
-# ✅ CSS for pastel background and black fields
+# ✅ CSS for gradient background and bold black text
 st.markdown("""
     <style>
     html, body, [data-testid="stAppViewContainer"] {
@@ -41,6 +35,7 @@ st.markdown("""
         border-radius: 8px;
     }
 
+    /* Bold and black title and subtitle */
     h1, h2 {
         color: #000000 !important;
         font-weight: 800 !important;
@@ -57,12 +52,6 @@ name = st.text_input("👤 Employee Name")
 total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=0)
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 hours_per_week = st.slider("⏱️ Hours per Week", min_value=10, max_value=80, value=40)
-
-# 🎓 Education Level
-education = st.selectbox("🎓 Education Level", [
-    "High School", "Diploma", "Bachelor's", "Master's", "PhD"
-])
-
 occupation = st.selectbox("👨‍💻 Current Occupation", [
     "Software Engineer", "Data Analyst", "Web Developer", "Teacher", "HR Executive"
 ])
@@ -90,33 +79,30 @@ if st.button("🔮 Predict Salary & Score"):
     if uploaded_file is None or not resume_text.strip():
         st.error("⚠️ Please upload your resume to proceed with prediction.")
     else:
-        try:
-            # Encode input features
-            occupation_encoded = encoder.transform([occupation])[0]
-            role_encoded = encoder.transform([applied_role])[0]
-            location_encoded = encoder.transform([location])[0]
-            education_encoded = encoder.transform([education])[0]
-            marital_status_encoded = 1 if marital_status == "Married" else 0
+        # 🧠 Salary Prediction Logic
+        base_salary = 200000 if total_exp == 0 else 300000
+        salary = base_salary + (total_exp * 45000) + (hours_per_week * 900)
 
-            # 🚀 Model expects: occupation, role, location, education, exp, hours, marital
-            input_array = np.array([[occupation_encoded, role_encoded, location_encoded, education_encoded,
-                                     total_exp, hours_per_week, marital_status_encoded]])
-            salary = model.predict(input_array)[0]
+        if marital_status == "Married":
+            salary += 20000
 
-            # 📊 ATS Resume Scoring
-            ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
-            resume_lower = resume_text.lower()
-            matched_keywords = sum(1 for kw in ats_keywords if kw in resume_lower)
-            ats_score = int((matched_keywords / len(ats_keywords)) * 100)
+        if location in ["Bangalore", "Mumbai", "Delhi"]:
+            salary += 40000
+        elif location == "Remote":
+            salary -= 30000
 
-            # 📢 Output
-            formatted_salary = format_currency(salary, 'INR', locale='en_IN')
-            st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
-            st.info(f"📊 ATS Resume Score: {ats_score}%")
+        # 📊 ATS Resume Scoring
+        ats_keywords = ["python", "sql", "machine learning", "communication", "teamwork", "data analysis"]
+        resume_lower = resume_text.lower()
+        matched_keywords = sum(1 for kw in ats_keywords if kw in resume_lower)
+        ats_score = int((matched_keywords / len(ats_keywords)) * 100)
 
-            if ats_score < 50:
-                st.warning("⚠️ Consider improving your resume with more relevant skills.")
-            else:
-                st.success("✅ Great! Your resume is well-optimized.")
-        except Exception as e:
-            st.error(f"❌ Prediction failed. Make sure your model supports the education feature.\n\nError: {e}")
+        # 📢 Output Results
+        formatted_salary = format_currency(salary, 'INR', locale='en_IN')
+        st.success(f"💼 Predicted Annual Salary for {name or 'Employee'}: {formatted_salary}")
+        st.info(f"📊 ATS Resume Score: {ats_score}%")
+
+        if ats_score < 50:
+            st.warning("⚠️ Consider improving your resume with more relevant skills.")
+        else:
+            st.success("✅ Great! Your resume is well-optimized.")
