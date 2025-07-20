@@ -61,7 +61,7 @@ applied_role = st.selectbox("🎯 Applied Role", [
     "Junior Developer", "Senior Developer", "Team Lead", "Manager", "Intern"
 ])
 location = st.selectbox("📍 Location", [
-    "Bangalore", "Hyderabad", "Delhi", "Mumbai", "Chennai", "Kolkata", "Pune", "Remote"
+    "Bangalore", "Hyderabad", "Delhi", "Mumbai", "Chennai", "Kolkata", "Pune","Visakhapatnam", "Remote"
 ])
 
 # 📄 Resume Upload
