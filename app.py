@@ -119,15 +119,21 @@ if st.button("🔮 Predict Salary & Score"):
         else:
             st.success("✅ Great! Your resume is well-optimized.")
             # 👤 Footer
-st.markdown(
-    """
+# 🌟 Creative Footer
+st.markdown("""
     <hr style="margin-top: 50px; border: none; height: 1px; background-color: #ccc;" />
-    <div style='text-align: center; color: #333333; font-size: 16px; padding-top: 10px;'>
-        Created by <strong>V. Srinitya Gargeyi</strong> 💫<br>
-        <a href="https://www.linkedin.com/in/srinitya-gargeyi-vadlamani" target="_blank" style="text-decoration: none; color: #0077b5;">🔗 LinkedIn</a> | 
-        <a href="https://github.com/Srinitya22" target="_blank" style="text-decoration: none; color: #333;">💻 GitHub</a>
+    <div style="text-align: center; padding-top: 20px; font-family: 'Segoe UI', sans-serif;">
+        <p style="font-size: 18px; color: #444;">
+            🚀 Powered with passion and Python by <strong style="color: #d6336c;">V. Srinitya Gargeyi</strong>
+        </p>
+        <p style="font-size: 15px;">
+            📬 Let's connect & collaborate:<br>
+            <a href="https://www.linkedin.com/in/srinitya-gargeyi-vadlamani" target="_blank" style="color:#0077b5; text-decoration:none;">🔗 LinkedIn</a> |
+            <a href="https://github.com/Srinitya22" target="_blank" style="color:#333; text-decoration:none;">💻 GitHub</a>
+        </p>
+        <p style="font-size: 13px; color: #888;">
+            Made with 💖, Streamlit & Machine Learning
+        </p>
     </div>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
