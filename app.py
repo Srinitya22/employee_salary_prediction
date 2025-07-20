@@ -35,7 +35,6 @@ st.markdown("""
         border-radius: 8px;
     }
 
-    /* Bold and black title and subtitle */
     h1, h2 {
         color: #000000 !important;
         font-weight: 800 !important;
@@ -50,6 +49,9 @@ st.subheader("Predict salary in ₹ & check your resume score 🔍")
 # 📥 Form Inputs
 name = st.text_input("👤 Employee Name")
 total_exp = st.number_input("🧳 Total Experience (Years)", min_value=0, max_value=40, value=0)
+education = st.selectbox("🎓 Education Level", [
+    "High School", "Diploma", "Bachelor's Degree", "Master's Degree", "PhD"
+])
 marital_status = st.selectbox("💍 Marital Status", ["Single", "Married"])
 hours_per_week = st.slider("⏱️ Hours per Week", min_value=10, max_value=80, value=40)
 occupation = st.selectbox("👨‍💻 Current Occupation", [
@@ -82,6 +84,16 @@ if st.button("🔮 Predict Salary & Score"):
         # 🧠 Salary Prediction Logic
         base_salary = 200000 if total_exp == 0 else 300000
         salary = base_salary + (total_exp * 45000) + (hours_per_week * 900)
+
+        # Add salary impact based on education
+        if education == "Diploma":
+            salary += 10000
+        elif education == "Bachelor's Degree":
+            salary += 25000
+        elif education == "Master's Degree":
+            salary += 40000
+        elif education == "PhD":
+            salary += 60000
 
         if marital_status == "Married":
             salary += 20000
