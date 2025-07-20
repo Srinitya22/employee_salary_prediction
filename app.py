@@ -124,8 +124,8 @@ st.markdown(
     <hr style="margin-top: 50px; border: none; height: 1px; background-color: #ccc;" />
     <div style='text-align: center; color: #333333; font-size: 16px; padding-top: 10px;'>
         Created by <strong>V. Srinitya Gargeyi</strong> 💫<br>
-        <a href="https://www.linkedin.com/in/your-linkedin-id" target="_blank" style="text-decoration: none; color: #0077b5;">🔗 LinkedIn</a> | 
-        <a href="https://github.com/your-github-id" target="_blank" style="text-decoration: none; color: #333;">💻 GitHub</a>
+        <a href="https://www.linkedin.com/in/srinitya-gargeyi-vadlamani" target="_blank" style="text-decoration: none; color: #0077b5;">🔗 LinkedIn</a> | 
+        <a href="https://github.com/Srinitya22" target="_blank" style="text-decoration: none; color: #333;">💻 GitHub</a>
     </div>
     """,
     unsafe_allow_html=True
